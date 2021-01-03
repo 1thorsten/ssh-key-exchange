@@ -37,13 +37,13 @@ func HandleArgs() Args {
 	// https://github.com/akamensky/argparse
 	args.Host = parser.String("i", "host", &argparse.Options{Required: true, Help: "Host ip (10.10.0.3) or in conjunction with range (10.20.0.X)"})
 	args.Port = parser.String("P", "port", &argparse.Options{Required: false, Help: "port of ssh host", Default: "22"})
-	args.User = parser.String("u", "user", &argparse.Options{Required: false, Help: "user of ssh ost", Default: "root"})
+	args.User = parser.String("u", "user", &argparse.Options{Required: false, Help: "user of ssh host", Default: "root"})
 	args.Password = parser.String("p", "password", &argparse.Options{Required: false, Help: "ssh password"})
 	args.RsaPrivPath = parser.String("a", "rsaPrivPath", &argparse.Options{Required: false, Help: "path of id_rsa", Default: idRsa})
 	args.RsaPubPath = parser.String("b", "rsaPubPath", &argparse.Options{Required: false, Help: "path of id_rsa.pub", Default: idRsaPub})
 	args.RsaKeyGenerate = parser.Flag("k", "rsaKeyGenerate", &argparse.Options{Required: false, Help: "generate keys, base path is rsaPrivPath", Default: *args.RsaPrivPath == idRsa})
 	args.Range = parser.String("r", "range", &argparse.Options{Required: false, Help: "range (1-6,8,13-233)"})
-	args.Exclude = parser.String("e", "exclude", &argparse.Options{Required: false, Help: "comma separated list of excluded ipaddresses (only in conjunction with range)"})
+	args.Exclude = parser.String("e", "exclude", &argparse.Options{Required: false, Help: "comma separated list of excluded ip addresses (only in conjunction with range)"})
 	keyGenerate := true
 	args.RsaKeyGenerate = &keyGenerate
 
