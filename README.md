@@ -9,7 +9,7 @@ ske performs all the necessary steps that you must perform before key-based auth
 5. at the end a short report is generated
 
 # Build
-for the local environemnt
+for the local environment (os and architecture)
 ```bash
 make build
 ```
@@ -29,7 +29,11 @@ To test ske you can use a netty ssh-server from docker-hub
 docker run --rm --publish=2222:22 --name ssh-server-local sickp/alpine-sshd:latest
 
 # second terminal
-bin/ssh-key-exchange --host 127.0.0.1 --port 2222 --user root --rsaKeyGenerate --rsaPrivPath ./id_rsa --rsaPubPath ./idrsa.pub
+## generating (you have to specify the password)
+ssh-key-exchange --host 127.0.0.1 --port 2222 --user root --rsaKeyGenerate
+
+## ssh shell keybased
+ssh -o StrictHostKeyChecking=no root@127.0.0.1 -p 2222
 ```
 Stopping the ssh-server as follows:
 ````bash
