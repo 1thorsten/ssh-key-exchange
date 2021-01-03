@@ -20,13 +20,13 @@ import (
 func HandleRSAKeys(rsaPrivPath string, rsaPubPath string, createIfNotExisting bool) {
 	if (!existsFileOrDir(rsaPrivPath) || !existsFileOrDir(rsaPubPath)) && createIfNotExisting {
 		if dirname := path.Dir(rsaPrivPath); !existsFileOrDir(dirname) {
-			if err := os.MkdirAll(dirname, 0600); err != nil {
+			if err := os.MkdirAll(dirname, 0700); err != nil {
 				log.Fatal(err.Error())
 			}
 		}
 
 		if dirname := path.Dir(rsaPubPath); !existsFileOrDir(dirname) {
-			if err := os.MkdirAll(dirname, 0600); err != nil {
+			if err := os.MkdirAll(dirname, 0700); err != nil {
 				log.Fatal(err.Error())
 			}
 		}
@@ -149,6 +149,7 @@ func DistributeKey(host string, args Args) *Summary {
 			if args.Password == nil || *args.Password == "" {
 				fmt.Print("Enter Password: ")
 				bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
+				println("")
 				if err != nil {
 					panic(err)
 				}
