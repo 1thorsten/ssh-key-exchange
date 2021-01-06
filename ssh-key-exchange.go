@@ -2,17 +2,34 @@ package main
 
 import (
 	"fmt"
-	local "ssh-key-exchange/localHelper"
+	"io/ioutil"
+	"ssh-key-exchange/helper"
+	"ssh-key-exchange/sshkeys"
+	"strings"
 )
 
+func readVersion() string {
+	content, err := ioutil.ReadFile("version_git_tag")
+	var version string
+	if err != nil {
+		version = "-version_git_tag is missing-"
+	} else {
+		version = string(content)
+		version = strings.TrimSuffix(version, "\n")
+	}
+
+	return version
+}
+
 func main() {
-	var args = local.HandleArgs()
 
-	local.HandleRSAKeys(*args.RsaPrivPath, *args.RsaPubPath, *args.RsaKeyGenerate)
+	var args = helper.HandleArgs(readVersion())
 
-	var summaryList []*local.Summary
-	for _, host := range local.ResolveRemoteHostIpAddresses(*args.Host, args.Range, args.Exclude) {
-		summary := local.DistributeKey(host, args)
+	sshkeys.HandleRSAKeys(*args.RsaPrivPath, *args.RsaPubPath, *args.RsaKeyGenerate)
+
+	var summaryList []*helper.Summary
+	for _, host := range helper.ResolveRemoteHostIpAddresses(*args.Host, args.Range, args.Exclude) {
+		summary := sshkeys.DistributeKey(host, args)
 		summaryList = append(summaryList, summary)
 	}
 
