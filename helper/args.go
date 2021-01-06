@@ -1,4 +1,4 @@
-package localHelper
+package helper
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ type Args struct {
 }
 
 // handle arguments from command-line
-func HandleArgs() Args {
+func HandleArgs(version string) *Args {
 	home, found := os.LookupEnv("USERPROFILE")
 	if !found {
 		home = os.Getenv("HOME")
@@ -30,7 +30,7 @@ func HandleArgs() Args {
 	idRsaPub := filepath.FromSlash(idRsa + ".pub")
 
 	// Create new parser object
-	parser := argparse.NewParser("dist_ssh_keys", "helps to exchange ssh-keys for key based ssh authentication")
+	parser := argparse.NewParser("ssh-key-exchange (v"+version+")", "helps to exchange ssh-keys for key based ssh authentication")
 	// Create string flag
 
 	var args Args
@@ -56,5 +56,5 @@ func HandleArgs() Args {
 		os.Exit(1)
 	}
 
-	return args
+	return &args
 }

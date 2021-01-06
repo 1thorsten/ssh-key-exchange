@@ -1,4 +1,4 @@
-package sshHelper
+package sshkeys
 
 import (
 	"os"

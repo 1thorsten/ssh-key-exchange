@@ -1,4 +1,4 @@
-package sshHelper
+package sshkeys
 
 import (
 	"bytes"
@@ -17,19 +17,14 @@ import (
 	"time"
 )
 
-func publicKeyFile(file string) ssh.AuthMethod {
-	buffer, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil
-	}
-
-	key, err := ssh.ParsePrivateKey(buffer)
-	if err != nil {
-		return nil
-	}
-	return ssh.PublicKeys(key)
+type ScriptResult struct {
+	LocalPath  string
+	RemotePath string
+	Content    string
 }
 
+// createRemoteScript
+// create the script for the remote computer (copies the public key)
 func createRemoteScript(rsaPubPath string, user string) *ScriptResult {
 	var seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 	random := strconv.Itoa(seededRand.Int())
@@ -67,6 +62,8 @@ func createRemoteScript(rsaPubPath string, user string) *ScriptResult {
 	return &ScriptResult{LocalPath: localPath, RemotePath: remotePath, Content: buf.String()}
 }
 
+// copyRemoteScript
+// copies the generated script to the remote computer
 func copyRemoteScript(client *ssh.Client, script *ScriptResult) (bool, error) {
 	if err := ioutil.WriteFile(script.LocalPath, []byte(script.Content), 0644); err != nil {
 		log.Printf("could not write file '%s' -> %s\n", script.LocalPath, err.Error())
@@ -140,16 +137,4 @@ func copyRemoteScript(client *ssh.Client, script *ScriptResult) (bool, error) {
 	}
 
 	return true, nil
-}
-
-func executeCmd(client *ssh.Client, command string) {
-	session, _ := client.NewSession()
-	defer session.Close()
-
-	session.Stdout = os.Stdout
-	session.Stderr = os.Stderr
-	if err := session.Run(command); err != nil {
-		log.Println(err.Error())
-	}
-
 }
