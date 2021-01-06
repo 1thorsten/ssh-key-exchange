@@ -2,28 +2,16 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"ssh-key-exchange/helper"
 	"ssh-key-exchange/sshkeys"
-	"strings"
 )
 
-func readVersion() string {
-	content, err := ioutil.ReadFile("version_git_tag")
-	var version string
-	if err != nil {
-		version = "-version_git_tag is missing-"
-	} else {
-		version = string(content)
-		version = strings.TrimSuffix(version, "\n")
-	}
-
-	return version
-}
+// https://stackoverflow.com/questions/13904441/whats-the-best-way-to-bundle-static-resources-in-a-go-program
+//go:embed hello.txt / go 1.16
+var version = "1.0.1"
 
 func main() {
-
-	var args = helper.HandleArgs(readVersion())
+	var args = helper.HandleArgs(version)
 
 	sshkeys.HandleRSAKeys(*args.RsaPrivPath, *args.RsaPubPath, *args.RsaKeyGenerate)
 
