@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"ssh-key-exchange/helper"
 	"ssh-key-exchange/sshkeys"
 )
@@ -15,9 +16,14 @@ func main() {
 
 	sshkeys.HandleRSAKeys(*args.RsaPrivPath, *args.RsaPubPath, *args.RsaKeyGenerate)
 
+	var success = false
+
 	var summaryList []*helper.Summary
 	for _, host := range helper.ResolveRemoteHostIpAddresses(*args.Host, args.Range, args.Exclude) {
 		summary := sshkeys.DistributeKey(host, args)
+		if summary.Success {
+			success = true
+		}
 		summaryList = append(summaryList, summary)
 	}
 
@@ -25,4 +31,7 @@ func main() {
 		fmt.Printf("%s\t -> %s\n", s.Host, s.Status())
 	}
 
+	if !success {
+		os.Exit(1)
+	}
 }
