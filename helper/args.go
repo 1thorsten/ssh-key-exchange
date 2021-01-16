@@ -17,7 +17,6 @@ type Args struct {
 	RsaKeyGenerate *bool
 	Range          *string
 	Exclude        *string
-	//	Quiet		   *bool
 }
 
 // handle arguments from command-line
@@ -45,7 +44,6 @@ func HandleArgs(version string) *Args {
 	args.RsaKeyGenerate = parser.Flag("k", "rsaKeyGenerate", &argparse.Options{Required: false, Help: "generate keys, base path is rsaPrivPath", Default: *args.RsaPrivPath == idRsa})
 	args.Range = parser.String("r", "range", &argparse.Options{Required: false, Help: "range (1-6,8,13-233)"})
 	args.Exclude = parser.String("e", "exclude", &argparse.Options{Required: false, Help: "comma separated list of excluded ip addresses (only in conjunction with range)"})
-	//	args.Quiet = parser.Flag("q", "quiet", &argparse.Options{Required: false, Help: "suppress output", Default: false})
 
 	// Parse input
 	err := parser.Parse(os.Args)

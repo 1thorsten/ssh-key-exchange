@@ -9,7 +9,7 @@ import (
 
 // https://stackoverflow.com/questions/13904441/whats-the-best-way-to-bundle-static-resources-in-a-go-program
 //go:embed hello.txt / go 1.16
-var version = "1.0.1"
+var version = "1.0.2"
 
 func main() {
 	var args = helper.HandleArgs(version)
