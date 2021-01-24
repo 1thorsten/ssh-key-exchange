@@ -22,7 +22,7 @@ type ConnectionConfig struct {
 
 // distribute the public key to the remote server and check it afterwards
 func DistributeKey(host string, args *helper.Args) *helper.Summary {
-	summary := &helper.Summary{Host: host, Success: true}
+	summary := &helper.Summary{Host: host, Success: true, Action: "ADD"}
 
 	log.Println("check: " + host)
 	if checkTcpPort(host, *args.Port, 120*time.Millisecond) {
@@ -150,7 +150,7 @@ func transferPublicKey(config *ConnectionConfig, password string, rsaPubPath str
 	}
 	defer session.Close()
 
-	script := createRemoteScript(rsaPubPath, config.User)
+	script := createRemoteScriptForAddingKey(rsaPubPath, config.User)
 	if _, err = copyRemoteScript(client, script); err != nil {
 		return false, err
 	}

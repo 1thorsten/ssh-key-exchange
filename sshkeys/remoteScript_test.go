@@ -14,7 +14,7 @@ func TestCreateRemoteScript(t *testing.T) {
 	}
 
 	idRsaPub := filepath.FromSlash(home + "/.ssh/id_rsa.pub")
-	v := createRemoteScript(idRsaPub, "icke")
+	v := createRemoteScriptForAddingKey(idRsaPub, "icke")
 
 	defer os.Remove(v.LocalPath)
 

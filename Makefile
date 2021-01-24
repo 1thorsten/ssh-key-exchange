@@ -1,4 +1,8 @@
+update_dependencies:
+	go get -u all
+
 create_git_tag:
+	git pull
 	git describe --abbrev=0 --tags > version_git_tag
 
 build: create_git_tag

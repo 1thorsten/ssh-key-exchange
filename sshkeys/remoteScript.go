@@ -9,6 +9,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	os_user "os/user"
 	"path"
 	"strconv"
 	"strings"
@@ -23,21 +24,30 @@ type ScriptResult struct {
 	Content    string
 }
 
-// createRemoteScript
+// createRemoteScriptForAddingKey
 // create the script for the remote computer (copies the public key)
-func createRemoteScript(rsaPubPath string, user string) *ScriptResult {
+func createRemoteScriptForAddingKey(rsaPubPath string, user string) *ScriptResult {
+	requestor := "unknown"
+	if osUser, err := os_user.Current(); err == nil {
+		requestor = osUser.Username
+	}
+	if hostname, err := os.Hostname(); err == nil {
+		requestor += "@" + hostname
+	}
+
 	var seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 	random := strconv.Itoa(seededRand.Int())
-	baseName := "ssh-script." + random
+	baseName := "ssh-script-add-key." + random
 	localPath := os.TempDir() + string(os.PathSeparator) + baseName
 	remotePath := "/tmp/" + baseName
 	_rsaPubKey, _ := ioutil.ReadFile(rsaPubPath)
 
 	data := &map[string]string{
-		"User":     user,
-		"Backtick": "`",
-		"Key":      strings.TrimSpace(string(_rsaPubKey)),
-		"File":     remotePath,
+		"User":      user,
+		"Backtick":  "`",
+		"Key":       strings.TrimSpace(string(_rsaPubKey)),
+		"File":      remotePath,
+		"Requestor": requestor,
 	}
 	content := `\
         mkdir -p ~{{.User}}/.ssh
@@ -49,14 +59,50 @@ func createRemoteScript(rsaPubPath string, user string) *ScriptResult {
         COUNT={{.Backtick}}cat ~{{.User}}/.ssh/authorized_keys | grep -i '{{.Key}}' | wc -l{{.Backtick}}
         
 		if [ "$COUNT" -eq 0 ]; then
-          printf '\n{{.Key}}\n' >> ~{{.User}}/.ssh/authorized_keys
+          printf '\n{{.Key}} {{.Requestor}}\n' >> ~{{.User}}/.ssh/authorized_keys
         fi
         
         {{/* remove this script */}}
         rm {{.File}}`
 
 	var buf bytes.Buffer
-	t, _ := template.New("remoteScript").Parse(content)
+	t, _ := template.New("remoteScript-key-add").Parse(content)
+	_ = t.Execute(&buf, data)
+
+	return &ScriptResult{LocalPath: localPath, RemotePath: remotePath, Content: buf.String()}
+}
+
+// createRemoteScriptForDeletingKey
+// create the script for the remote computer (removing the public key)
+func createRemoteScriptForDeletingKey(rsaPubPath string, user string) *ScriptResult {
+	var seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
+	random := strconv.Itoa(seededRand.Int())
+	baseName := "ssh-script-delete-key." + random
+	localPath := os.TempDir() + string(os.PathSeparator) + baseName
+	remotePath := "/tmp/" + baseName
+	_rsaPubKey, _ := ioutil.ReadFile(rsaPubPath)
+
+	data := &map[string]string{
+		"User":     user,
+		"Backtick": "`",
+		"Key":      strings.TrimSpace(string(_rsaPubKey)),
+		"File":     remotePath,
+	}
+	content := `\
+		{{/* Determine line no */}}
+		LINE_NO={{.Backtick}}grep -n '{{.Key}}' ~{{.User}}/.ssh/authorized_keys | cut -f1 -d:{{.Backtick}}
+
+		{{/* Delete line with the key */}}
+		sed -i "${LINE_NO}d" ~{{.User}}/.ssh/authorized_keys
+
+		{{/* Delete empty lines or blank lines */}}
+		sed -i '/^$/d' ~{{.User}}/.ssh/authorized_keys
+
+        {{/* remove this script */}}
+        rm {{.File}}`
+
+	var buf bytes.Buffer
+	t, _ := template.New("remoteScript-key-delete").Parse(content)
 	_ = t.Execute(&buf, data)
 
 	return &ScriptResult{LocalPath: localPath, RemotePath: remotePath, Content: buf.String()}

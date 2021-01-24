@@ -9,7 +9,7 @@ import (
 
 // https://stackoverflow.com/questions/13904441/whats-the-best-way-to-bundle-static-resources-in-a-go-program
 //go:embed hello.txt / go 1.16
-var version = "1.0.2"
+var version = "1.0.3"
 
 func main() {
 	var args = helper.HandleArgs(version)
@@ -20,7 +20,12 @@ func main() {
 
 	var summaryList []*helper.Summary
 	for _, host := range helper.ResolveRemoteHostIpAddresses(*args.Host, args.Range, args.Exclude) {
-		summary := sshkeys.DistributeKey(host, args)
+		var summary *helper.Summary
+		if *args.Delete {
+			summary = sshkeys.DeleteKey(host, args)
+		} else {
+			summary = sshkeys.DistributeKey(host, args)
+		}
 		if summary.Success {
 			success = true
 		}
