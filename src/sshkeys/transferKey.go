@@ -8,7 +8,7 @@ import (
 	"log"
 	"net"
 	"os"
-	"ssh-key-exchange/helper"
+	"ssh-key-exchange/src/helper"
 	"strings"
 	"syscall"
 	"time"

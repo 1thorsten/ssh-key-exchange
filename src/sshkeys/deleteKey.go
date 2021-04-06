@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"golang.org/x/crypto/ssh"
 	"net"
-	"ssh-key-exchange/helper"
+	"ssh-key-exchange/src/helper"
 	"time"
 )
 

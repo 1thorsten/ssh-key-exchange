@@ -1,17 +1,20 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
 	"os"
-	"ssh-key-exchange/helper"
-	"ssh-key-exchange/sshkeys"
+	"ssh-key-exchange/src/helper"
+	"ssh-key-exchange/src/sshkeys"
+	"strings"
 )
 
 // https://stackoverflow.com/questions/13904441/whats-the-best-way-to-bundle-static-resources-in-a-go-program
-//go:embed hello.txt / go 1.16
-var version = "1.0.3"
+//go:embed version_git_tag
+var version string
 
 func main() {
+	version = strings.TrimSuffix(version, "\n")
 	var args = helper.HandleArgs(version)
 
 	sshkeys.HandleRSAKeys(*args.RsaPrivPath, *args.RsaPubPath, *args.RsaKeyGenerate)
