@@ -3,7 +3,7 @@ update_dependencies:
 
 create_git_tag:
 	git pull
-	git tag 1.0.4
+	git tag 1.0.5
 
 retrieve_git_tag:
 	git pull
